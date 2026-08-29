@@ -12,7 +12,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>17.0.2</javafx.version>
+        <javafx.version>21.0.11</javafx.version>
         <commonmark.version>0.21.0</commonmark.version>
         <junit.version>5.10.0</junit.version>
     </properties>
@@ -88,6 +88,10 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.notebook.MainApp</mainClass>
+                    <options>
+                        <option>--add-modules</option>
+                        <option>javafx.controls,javafx.fxml,javafx.web</option>
+                    </options>
                 </configuration>
             </plugin>
         </plugins>
