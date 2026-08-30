@@ -85,3 +85,7 @@ mvn clean compile javafx:run
 
 - **Pass condition:** A 600×400 desktop window pops up rendering the styled blue header and paragraph.
 - **Fail condition:** The terminal throws native binary errors (e.g., `libjfxwebkit`, missing architecture `.dylib`/`.so`/`.dll`, or module access warnings).
+
+Now with javaFX test done successfully, lets build the notebook system, then connect it to the javaFX UI.
+
+
