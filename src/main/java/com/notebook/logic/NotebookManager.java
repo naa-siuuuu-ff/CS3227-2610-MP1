@@ -2,20 +2,20 @@ package com.notebook.logic;
 
 import com.notebook.model.Note;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class NotebookManager {
     private final NoteRepository repository;
     private final MarkdownRenderer renderer;
+    private final SearchEngine searchEngine;
 
-    public NotebookManager(NoteRepository repository, MarkdownRenderer renderer) {
+    public NotebookManager(NoteRepository repository, MarkdownRenderer renderer, SearchEngine searchEngine) {
         this.repository = Objects.requireNonNull(repository, "Repository must not be null");
         this.renderer = Objects.requireNonNull(renderer, "Renderer must not be null");
+        this.searchEngine = Objects.requireNonNull(searchEngine, "SearchEngine must not be null");
     }
 
     public List<Note> getAllNotes() {
@@ -41,7 +41,7 @@ public class NotebookManager {
 
     public Note updateNoteContent(String id, String newContent) {
         Note existing = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Note not found with ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Note not found: " + id));
 
         Note updated = new Note(
                 existing.getId(),
@@ -65,14 +65,7 @@ public class NotebookManager {
         return renderer.renderToHtml(markdownSource);
     }
 
-    public List<Note> findByTag(String tag) {
-        if (tag == null || tag.isBlank()) {
-            return Collections.emptyList();
-        }
-        String cleanTag = tag.startsWith("#") ? tag.substring(1).toLowerCase() : tag.toLowerCase();
-        return repository.findAll().stream()
-                .filter(note -> note.getTags().stream()
-                        .anyMatch(t -> t.equalsIgnoreCase(cleanTag)))
-                .collect(Collectors.toUnmodifiableList());
+    public List<Note> searchNotes(String query) {
+        return searchEngine.search(repository.findAll(), query);
     }
 }

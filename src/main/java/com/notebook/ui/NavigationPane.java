@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -26,6 +27,10 @@ public class NavigationPane extends VBox {
         setPadding(new Insets(8));
         setSpacing(8);
 
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search title, text, or #tag...");
+        searchField.textProperty().bindBidirectional(viewModel.searchQueryProperty());
+
         Button newBtn = new Button("+ Note");
         Button deleteBtn = new Button("Delete");
         newBtn.setMaxWidth(Double.MAX_VALUE);
@@ -35,7 +40,6 @@ public class NavigationPane extends VBox {
         deleteBtn.setOnAction(e -> viewModel.deleteCurrentNote());
 
         HBox actions = new HBox(8, newBtn, deleteBtn);
-        actions.setFillHeight(true);
         HBox.setHgrow(newBtn, Priority.ALWAYS);
         HBox.setHgrow(deleteBtn, Priority.ALWAYS);
 
@@ -48,11 +52,11 @@ public class NavigationPane extends VBox {
         });
 
         VBox.setVgrow(noteListView, Priority.ALWAYS);
-        getChildren().addAll(actions, noteListView);
+        getChildren().addAll(searchField, actions, noteListView);
     }
 
     private void bindViewModel() {
-        noteListView.setItems(viewModel.getNotes());
+        noteListView.setItems(viewModel.getDisplayedNotes());
 
         noteListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.equals(viewModel.activeNoteProperty().get())) {

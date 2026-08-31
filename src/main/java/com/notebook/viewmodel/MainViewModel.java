@@ -1,5 +1,7 @@
 package com.notebook.viewmodel;
 
+import java.util.Objects;
+
 import com.notebook.logic.NotebookManager;
 import com.notebook.model.Note;
 import javafx.animation.PauseTransition;
@@ -15,42 +17,44 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Duration;
 
-// presentation state and properties
 public class MainViewModel {
     private final NotebookManager manager;
 
-    private final ObservableList<Note> notes = FXCollections.observableArrayList();
+    private final ObservableList<Note> displayedNotes = FXCollections.observableArrayList();
     private final ObjectProperty<Note> activeNote = new SimpleObjectProperty<>();
+    private final StringProperty searchQuery = new SimpleStringProperty("");
     private final StringProperty editorContent = new SimpleStringProperty("");
     private final StringProperty htmlPreview = new SimpleStringProperty("");
     private final BooleanProperty isDirty = new SimpleBooleanProperty(false);
 
-    private final PauseTransition debounceTimer = new PauseTransition(Duration.millis(250));
+    private final PauseTransition renderDebounce = new PauseTransition(Duration.millis(250));
 
     public MainViewModel(NotebookManager manager) {
         this.manager = manager;
         setupDebounce();
-        setupEditorBinding();
-        loadAllNotes();
+        setupListeners();
+        applyFilter();
     }
 
     private void setupDebounce() {
-        debounceTimer.setOnFinished(event -> {
-            String markdown = editorContent.get();
-            htmlPreview.set(manager.renderMarkdown(markdown));
+        renderDebounce.setOnFinished(e -> {
+            String md = editorContent.get();
+            htmlPreview.set(manager.renderMarkdown(md));
             if (activeNote.get() != null && isDirty.get()) {
                 saveCurrentNote();
             }
         });
     }
 
-    private void setupEditorBinding() {
+    private void setupListeners() {
+        searchQuery.addListener((obs, oldVal, newVal) -> applyFilter());
+
         editorContent.addListener((obs, oldVal, newVal) -> {
             Note current = activeNote.get();
             if (current != null) {
-                boolean changed = !newVal.equals(current.getContent());
-                isDirty.set(changed);
-                debounceTimer.playFromStart();
+                boolean modified = !Objects.equals(newVal, current.getContent());
+                isDirty.set(modified);
+                renderDebounce.playFromStart();
             }
         });
 
@@ -67,16 +71,16 @@ public class MainViewModel {
         });
     }
 
-    public void loadAllNotes() {
-        notes.setAll(manager.getAllNotes());
-        if (!notes.isEmpty() && activeNote.get() == null) {
-            activeNote.set(notes.get(0));
+    public void applyFilter() {
+        displayedNotes.setAll(manager.searchNotes(searchQuery.get()));
+        if (!displayedNotes.isEmpty() && activeNote.get() == null) {
+            activeNote.set(displayedNotes.get(0));
         }
     }
 
     public void createNewNote(String title) {
         Note created = manager.createNote(title, "");
-        notes.add(0, created);
+        applyFilter();
         activeNote.set(created);
     }
 
@@ -86,8 +90,8 @@ public class MainViewModel {
             return;
 
         manager.deleteNote(current.getId());
-        notes.remove(current);
-        activeNote.set(notes.isEmpty() ? null : notes.get(0));
+        applyFilter();
+        activeNote.set(displayedNotes.isEmpty() ? null : displayedNotes.get(0));
     }
 
     public void saveCurrentNote() {
@@ -96,20 +100,21 @@ public class MainViewModel {
             return;
 
         Note updated = manager.updateNoteContent(current.getId(), editorContent.get());
-        int index = notes.indexOf(current);
-        if (index != -1) {
-            notes.set(index, updated);
-        }
         activeNote.set(updated);
+        applyFilter();
         isDirty.set(false);
     }
 
-    public ObservableList<Note> getNotes() {
-        return notes;
+    public ObservableList<Note> getDisplayedNotes() {
+        return displayedNotes;
     }
 
     public ObjectProperty<Note> activeNoteProperty() {
         return activeNote;
+    }
+
+    public StringProperty searchQueryProperty() {
+        return searchQuery;
     }
 
     public StringProperty editorContentProperty() {

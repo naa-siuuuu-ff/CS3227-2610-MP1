@@ -18,7 +18,7 @@ public class MainWindow extends BorderPane {
 
         SplitPane splitPane = new SplitPane();
         splitPane.getItems().addAll(navigationPane, editor, previewPane);
-        splitPane.setDividerPositions(0.20, 0.60);
+        splitPane.setDividerPositions(0.25, 0.62);
 
         setCenter(splitPane);
     }

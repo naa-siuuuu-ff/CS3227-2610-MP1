@@ -16,12 +16,14 @@ class NotebookManagerTest {
 
     private NotebookManager manager;
     private InMemoryNoteRepository stubRepository;
+    private SearchEngine searchEngine;
 
     @BeforeEach
     void setUp() {
         stubRepository = new InMemoryNoteRepository();
         MarkdownRenderer stubRenderer = markdown -> "<p>" + markdown + "</p>";
-        manager = new NotebookManager(stubRepository, stubRenderer);
+        searchEngine = new SearchEngine();
+        manager = new NotebookManager(stubRepository, stubRenderer, searchEngine);
     }
 
     @Test
@@ -55,6 +57,16 @@ class NotebookManagerTest {
     void renderMarkdown_delegatesToRenderer() {
         String result = manager.renderMarkdown("**bold**");
         assertEquals("<p>**bold**</p>", result);
+    }
+
+    @Test
+    void searchNotes_delegatesToSearchEngine() {
+        manager.createNote("Meeting Notes", "Discuss Q3 goals");
+        manager.createNote("Grocery List", "Milk, eggs");
+
+        List<Note> results = manager.searchNotes("Meeting");
+        assertEquals(1, results.size());
+        assertEquals("Meeting Notes", results.get(0).getTitle());
     }
 
     private static class InMemoryNoteRepository implements NoteRepository {
