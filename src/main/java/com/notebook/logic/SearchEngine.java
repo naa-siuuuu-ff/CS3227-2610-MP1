@@ -4,7 +4,6 @@ import com.notebook.model.Note;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class SearchEngine {

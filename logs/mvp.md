@@ -133,4 +133,4 @@ UUID Display in Navigation: Identified a discrepancy where UUIDs were displayed 
 Unused Imports: Cleaned unneeded java.util.Objects imports in SearchEngine.java.
 Project Documentation: Generated AGENTS.md specifying architectural boundaries, headless testing rules, and an agent handoff prompt.
 
-I managed to build a working MVP, and fixed a bug along the way where notebook titles were different. It is time to move on to making the final product
+I managed to build a working MVP, and fixed a bug along the way where notebook titles were different. It is time to move on to making the final product.
