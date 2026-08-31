@@ -3,11 +3,13 @@ package com.notebook.viewmodel;
 import java.util.Objects;
 
 import com.notebook.logic.NotebookManager;
+import com.notebook.logic.TextStatistics;
 import com.notebook.model.Note;
 import javafx.animation.PauseTransition;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -26,6 +28,7 @@ public class MainViewModel {
     private final StringProperty editorContent = new SimpleStringProperty("");
     private final StringProperty htmlPreview = new SimpleStringProperty("");
     private final BooleanProperty isDirty = new SimpleBooleanProperty(false);
+    private final ObjectProperty<TextStatistics> statistics = new SimpleObjectProperty<>(TextStatistics.compute(""));
 
     private final PauseTransition renderDebounce = new PauseTransition(Duration.millis(250));
 
@@ -50,6 +53,7 @@ public class MainViewModel {
         searchQuery.addListener((obs, oldVal, newVal) -> applyFilter());
 
         editorContent.addListener((obs, oldVal, newVal) -> {
+            statistics.set(TextStatistics.compute(newVal));
             Note current = activeNote.get();
             if (current != null) {
                 boolean modified = !Objects.equals(newVal, current.getContent());
@@ -61,14 +65,20 @@ public class MainViewModel {
         activeNote.addListener((obs, oldNote, newNote) -> {
             if (newNote != null) {
                 editorContent.set(newNote.getContent());
+                statistics.set(TextStatistics.compute(newNote.getContent()));
                 htmlPreview.set(manager.renderMarkdown(newNote.getContent()));
                 isDirty.set(false);
             } else {
                 editorContent.set("");
+                statistics.set(TextStatistics.compute(""));
                 htmlPreview.set("");
                 isDirty.set(false);
             }
         });
+    }
+
+    public ReadOnlyObjectProperty<TextStatistics> statisticsProperty() {
+        return statistics;
     }
 
     public void applyFilter() {

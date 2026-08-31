@@ -18,6 +18,10 @@
   * `FileSystemStorage`: Path sanitization, collision counter logic (`Title 1.md`), atomic writes.
   * `CommonMarkRenderer`: GFM extensions (tables, strikethrough), HTML generation.
   * `PreviewPane`: WebKit `WebView` safe template replacement (`{{BODY}}`).
+* **TextStatistics (`com.notebook.logic.TextStatistics`)**:
+  * Pure domain record computing real-time document metrics (words, total characters, characters excluding whitespace, lines, and reading duration).
+  * Decoupled completely from JavaFX UI controls to support headless unit testing.
+  * Observed by `MainViewModel` and bound reactively to the `MainWindow` bottom status bar.
 
 ## 3. Key Architectural Workflows
 * **Note Creation & Auto-Save**: Flow from UI input -> ViewModel debounce -> Manager -> FileSystemStorage.
