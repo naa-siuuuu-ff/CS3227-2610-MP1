@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 public class NotebookManager {
     private final NoteRepository repository;
@@ -30,11 +29,21 @@ public class NotebookManager {
     }
 
     public Note createNote(String title, String initialContent) {
-        String noteId = UUID.randomUUID().toString();
         String safeTitle = (title == null || title.isBlank()) ? "Untitled" : title.trim();
+        String baseId = sanitizeFilename(safeTitle);
+        String noteId = baseId;
+
+        // Prevent file overwrites by appending an incremental counter
+        int counter = 1;
+        while (repository.exists(noteId)) {
+            noteId = baseId + " " + counter;
+            counter++;
+        }
+
+        String finalTitle = noteId.equals(baseId) ? safeTitle : safeTitle + " " + (counter - 1);
         String content = (initialContent == null) ? "" : initialContent;
 
-        Note newNote = new Note(noteId, safeTitle, content, Instant.now());
+        Note newNote = new Note(noteId, finalTitle, content, Instant.now());
         repository.save(newNote);
         return newNote;
     }
@@ -67,5 +76,10 @@ public class NotebookManager {
 
     public List<Note> searchNotes(String query) {
         return searchEngine.search(repository.findAll(), query);
+    }
+
+    private String sanitizeFilename(String input) {
+        String sanitized = input.replaceAll("[\\\\/:*?\"<>|]", "_").trim();
+        return sanitized.isEmpty() ? "Untitled" : sanitized;
     }
 }

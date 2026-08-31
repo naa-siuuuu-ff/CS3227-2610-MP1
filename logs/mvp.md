@@ -86,6 +86,51 @@ mvn clean compile javafx:run
 - **Pass condition:** A 600×400 desktop window pops up rendering the styled blue header and paragraph.
 - **Fail condition:** The terminal throws native binary errors (e.g., `libjfxwebkit`, missing architecture `.dylib`/`.so`/`.dll`, or module access warnings).
 
-Now with javaFX test done successfully, lets build the notebook system, then connect it to the javaFX UI.
+**Now with javaFX test done successfully, lets build the notebook system, then connect it to the javaFX UI.**
 
+## Session 2: Headless Core Implementation & Verification
+- **Date/Time**: 2026-08-30
+- **Goal**: Implement and verify the headless Core layer (domain models, repository/renderer ports, adapters, and unit tests) without any JavaFX GUI dependencies.
 
+### Prompts Issued
+1. **Prompt 1 (Implementation Request)**: Requested the complete source code and relevant test classes for Day 1:
+   - Domain models (`Note`, `FolderNode`).
+   - Logic ports (`NoteRepository`, `MarkdownRenderer`).
+   - Adapters (`FileSystemStorage`, `CommonMarkRenderer`).
+   - Unit tests for storage and markdown parsing.
+2. **Prompt 2 (Code Review & Clarification)**: Asked why `FolderNode` returned `Collections.unmodifiableList(...)` instead of raw lists (`getSubFolders()`, `getNoteIds()`).
+3. **Prompt 3 (Execution & Verification)**: Provided the output of `mvn clean test` (confirming 6/6 tests passed across `CommonMarkRendererTest` and `FileSystemStorageTest`) and requested a structured handover prompt for the next development phase.
+
+### Key Actions & Decisions
+- Implemented `Note` with regex-based `#tag` extraction, defensive copies, and dirty/last-modified timestamps.
+- Implemented `FolderNode` enforcing immutability/encapsulation via `Collections.unmodifiableList(...)` to prevent internal state leakage.
+- Created `NoteRepository` and `MarkdownRenderer` interfaces in `com.notebook.logic` to decouple core logic from filesystem I/O and third-party libraries.
+- Implemented `FileSystemStorage` using `java.nio.file` and `CommonMarkRenderer` configured with GitHub Flavored Markdown (GFM) tables and strikethrough extensions.
+- Wrote JUnit 5 tests utilizing `@TempDir` to ensure headless, disk-isolated test execution.
+- Executed `mvn clean test`: verified 6 tests run with 0 failures/errors in 3.96 seconds.
+- Formulated a comprehensive context-handover prompt detailing the architectural patterns, completed components, `pom.xml`, and remaining milestones for the next session.
+
+AI Interaction Log Entry: Architecture Wiring & JavaFX Stabilization
+Date: 31 August 2026
+Focus Area: Domain Orchestration, MVVM Presentation, JavaFX 3-Pane UI Assembly, and Bug Fixing
+Summary of Activities:
+Hexagonal Logic Orchestration (NotebookManager.java): Implemented the domain controller coordinating NoteRepository, MarkdownRenderer, and SearchEngine using pure standard library Java without UI framework dependencies.
+Headless Unit Testing (NotebookManagerTest.java): Authored JUnit 5 tests utilizing an in-memory repository stub and deterministic renderer stub to verify CRUD operations, search delegation, and rendering headlessly under mvn test.
+MVVM Presentation Layer (MainViewModel.java):
+Bound domain operations to JavaFX observable properties (ObservableList<Note>, activeNote, editorContent, htmlPreview, isDirty).
+Configured a 250 ms PauseTransition debounce mechanism to throttle HTML rendering and trigger auto-saving during rapid text input.
+Resolved missing java.util.Objects import causing compilation failures.
+Desktop UI Construction (com.notebook.ui):
+Built MainWindow.java utilizing a 3-pane SplitPane layout.
+Implemented NavigationPane.java with dynamic keyword/tag search filtering, note creation dialogs, and deletion controls.
+Constructed PreviewPane.java hosting an embedded WebKit WebView.
+Application Composition Root & Lifecycle (MainApp.java):
+Wired outbound file system and Markdown rendering adapters into NotebookManager and MainViewModel.
+Configured dual-stage safe shutdown handlers (setOnCloseRequest and stop()) to ensure dirty edits are flushed to disk before application exit.
+Bug Fixes & Refactoring:
+WebKit CSS Formatting Crash: Diagnosed and resolved an UnknownFormatConversionException where CSS percentage markers (width: 100%;) collided with String.formatted(); refactored HTML injection to use token replacement ({{BODY}}).
+UUID Display in Navigation: Identified a discrepancy where UUIDs were displayed instead of human-readable titles due to filename handling in FileSystemStorage; refactored NotebookManager.createNote to sanitize user titles as file identifiers and append auto-increment counters on name collisions.
+Unused Imports: Cleaned unneeded java.util.Objects imports in SearchEngine.java.
+Project Documentation: Generated AGENTS.md specifying architectural boundaries, headless testing rules, and an agent handoff prompt.
+
+I managed to build a working MVP, and fixed a bug along the way where notebook titles were different. It is time to move on to making the final product
