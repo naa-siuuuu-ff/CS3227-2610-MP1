@@ -38,6 +38,10 @@ public class MainApp extends Application {
         // UI Assembly
         MainWindow mainWindow = new MainWindow(viewModel);
         Scene scene = new Scene(mainWindow, 1100, 720);
+        var cssResource = getClass().getResource("/css/style.css");
+        if (cssResource != null) {
+            scene.getStylesheets().add(cssResource.toExternalForm());
+        }
 
         primaryStage.setTitle("Markdown Desktop Notebook");
         primaryStage.setMinWidth(800);
