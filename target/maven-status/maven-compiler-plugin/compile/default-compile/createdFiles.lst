@@ -1,10 +1,13 @@
+com/notebook/ui/MainWindow$1.class
 com/notebook/render/CommonMarkRenderer.class
 com/notebook/model/Note.class
 com/notebook/logic/NoteRepository.class
+com/notebook/logic/TextFormatter.class
 com/notebook/ui/PreviewPane$1.class
 com/notebook/ui/NavigationPane.class
 com/notebook/logic/TextStatistics.class
 com/notebook/viewmodel/MainViewModel.class
+com/notebook/logic/TextFormatter$FormatResult.class
 com/notebook/logic/NotebookManager.class
 com/notebook/logic/MarkdownRenderer.class
 com/notebook/ui/PreviewPane.class

@@ -1,6 +1,8 @@
 package com.notebook.ui;
 
 import com.notebook.viewmodel.MainViewModel;
+import com.notebook.logic.TextFormatter;
+
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Label;
@@ -14,6 +16,30 @@ public class MainWindow extends BorderPane {
         TextArea editor = new TextArea();
         editor.setWrapText(true);
         editor.textProperty().bindBidirectional(viewModel.editorContentProperty());
+        editor.setOnKeyPressed(event -> {
+            boolean isShortcut = event.isShortcutDown(); // Maps to Cmd on macOS, Ctrl on Windows/Linux
+            if (!isShortcut) {
+                return;
+            }
+
+            TextFormatter.FormatResult result = null;
+            switch (event.getCode()) {
+                case B -> result = TextFormatter.wrapSelection(
+                        editor.getText(), editor.getSelection().getStart(), editor.getSelection().getEnd(), "**", "**");
+                case I -> result = TextFormatter.wrapSelection(
+                        editor.getText(), editor.getSelection().getStart(), editor.getSelection().getEnd(), "*", "*");
+                case K -> result = TextFormatter.wrapSelection(
+                        editor.getText(), editor.getSelection().getStart(), editor.getSelection().getEnd(), "`", "`");
+                default -> {
+                }
+            }
+
+            if (result != null) {
+                editor.setText(result.newText());
+                editor.selectRange(result.newSelectionStart(), result.newSelectionEnd());
+                event.consume();
+            }
+        });
 
         PreviewPane previewPane = new PreviewPane(viewModel);
 

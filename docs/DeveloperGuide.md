@@ -22,6 +22,10 @@
   * Pure domain record computing real-time document metrics (words, total characters, characters excluding whitespace, lines, and reading duration).
   * Decoupled completely from JavaFX UI controls to support headless unit testing.
   * Observed by `MainViewModel` and bound reactively to the `MainWindow` bottom status bar.
+  * **TextFormatter (`com.notebook.logic.TextFormatter`)**:
+  * Pure utility class handling inline markdown token wrapping and multi-line prefixes.
+  * Preserves selection range and calculates cursor placement without any dependency on JavaFX text controls.
+  * Injected into the `MainWindow` editor key event pipeline via platform-independent shortcut accelerators (`event.isShortcutDown()`).
 
 ## 3. Key Architectural Workflows
 * **Note Creation & Auto-Save**: Flow from UI input -> ViewModel debounce -> Manager -> FileSystemStorage.

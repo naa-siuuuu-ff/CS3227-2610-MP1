@@ -16,6 +16,11 @@
 * **Auto-Save**: Background persistence with dirty-state indicator.
 * **Markdown Support**: Headers, lists, code blocks, GitHub-Flavored Markdown tables, and strikethroughs.
 * **Real-time Document Statistics**: The status bar at the bottom displays real-time metrics for the active note, including total word count, character count, line count, and estimated reading time (calculated at 200 words/minute).
+* **Formatting Shortcuts**: Format content rapidly in the editor using native keyboard shortcuts:
+  * `Ctrl+B` (or `Cmd+B` on macOS): Wraps selected text in `**bold**`.
+  * `Ctrl+I` (or `Cmd+I` on macOS): Wraps selected text in `*italics*`.
+  * `Ctrl+K` (or `Cmd+K` on macOS): Wraps selected text in `` `inline code` ``.
+  * If no text is selected, the formatting markers are inserted and the cursor is automatically positioned between them.
 
 ## 4. File Management & Local Storage
 * How notes map to `.md` files on disk.
