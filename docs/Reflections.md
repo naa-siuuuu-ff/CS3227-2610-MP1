@@ -16,3 +16,6 @@ Then I planned the architechture of the application, and cross checked the one g
 After that, I paused to prompt the LLM to deeply explain to me the chosen architetchture, and how it would work when everything is completed, before starting to write code.
 
 I also made a rough plan, which is to make a MVP, then slowly add features and make everything look nicer.
+
+**Stage 2: Making the MVP**
+

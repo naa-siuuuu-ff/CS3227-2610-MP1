@@ -1,0 +1,19 @@
+# Maven build target directory
+target/
+
+# Shaded POM generated during packaging
+dependency-reduced-pom.xml
+
+# macOS system files
+.DS_Store
+
+# IDE configuration directories
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Local runtime application data
+.markdown-notebook/
